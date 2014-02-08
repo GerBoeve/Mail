@@ -45,7 +45,7 @@ class MailOptions extends AbstractOptions implements MailOptionsInterface
     /**
      * @var string
      */
-    protected $signature;
+    protected $template;
     
     /**
      * @var string
@@ -190,24 +190,24 @@ class MailOptions extends AbstractOptions implements MailOptionsInterface
     }
 
 	/**
-     * Get signature 
+     * Get template 
      *
      * @return string
      */
-    public function getSignature()
+    public function getTemplate()
     {
-        return $this->signature;
+        return $this->template;
     }
 
 	/**
-     * Set signature
+     * Set template
      *
-     * @param string $signature
+     * @param string $template
      * @return \Mail\Options\MailOptionsInterface
      */
-    public function setSignature($signature)
+    public function setTemplate($template)
     {
-        $this->signature = $signature;
+        $this->template = $template;
         return $this;
     }
 
