@@ -1,6 +1,6 @@
-Mail
-====
+ZF2 Mail module
+===============
 
 Mail module
 
-version: 0.0.1
+version: v1.0.0
