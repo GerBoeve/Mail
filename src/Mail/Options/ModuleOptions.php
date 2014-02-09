@@ -11,32 +11,32 @@ class ModuleOptions extends AbstractOptions implements ModuleOptionsInterface
      * @var bool
      */
     protected $__strictMode__ = false;
-    
+
     /**
      * @var array
      */
     protected $templatePaths;
-    
+
     /**
      * Get template paths
-     * 
+     *
      * @return array
      */
     public function getTemplatePaths()
     {
         return $this->templatePaths;
     }
-    
+
     /**
      * Set template paths
-     * 
-     * @param array $templatePaths
+     *
+     * @param  array                                $templatePaths
      * @return \Mail\Options\ModuleOptionsInterface
      */
     public function setTemplatePaths(array $templatePaths)
     {
         $this->templatePaths = $templatePaths;
-        
+
         return $this;
     }
 }

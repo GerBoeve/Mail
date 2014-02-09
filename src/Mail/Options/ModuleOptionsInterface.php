@@ -9,11 +9,11 @@ interface ModuleOptionsInterface
      * @return array
      */
     public function getTemplatePaths();
-    
+
     /**
      * Set template paths
      *
-     * @param array $templatePaths
+     * @param  array                                $templatePaths
      * @return \Mail\Options\ModuleOptionsInterface
     */
     public function setTemplatePaths(array $templatePaths);

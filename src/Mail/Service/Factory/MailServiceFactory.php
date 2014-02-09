@@ -9,7 +9,8 @@ class MailServiceFactory implements FactoryInterface
 {
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-    	$service = new MailService($serviceLocator);
-    	return $service;
+        $service = new MailService($serviceLocator);
+
+        return $service;
     }
 }

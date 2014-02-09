@@ -10,13 +10,14 @@ class MailOptionsFactory implements FactoryInterface
 {
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-    	$config = $serviceLocator->get('Config');
-    	
-    	if (!isset($config['mail_config'])) {
-    	    throw new InvalidArgumentException('Configuration key "mail_config" not found!');
-    	}
-    	
-    	$options = new MailOptions($config['mail_config']);
-    	return $options;
+        $config = $serviceLocator->get('Config');
+
+        if (!isset($config['mail_config'])) {
+            throw new InvalidArgumentException('Configuration key "mail_config" not found!');
+        }
+
+        $options = new MailOptions($config['mail_config']);
+
+        return $options;
     }
 }
