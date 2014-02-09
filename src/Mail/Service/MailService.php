@@ -9,21 +9,39 @@
  * @license   LICENCE
  * 
  * @todo: attachements
+ * @todo: plain text body
  *
  */
 namespace Mail\Service;
 
 use Mail\Exception\InvalidArgumentException;
+use Zend\Mail\Message;
 use Zend\Mail\Transport\TransportInterface;
+use Zend\Mime\Message as MimeMessage;
+use Zend\Mime\Mime;
+use Zend\Mime\Part as MimePart;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\View\Model\ViewModel;
+use Zend\View\Renderer\PhpRenderer;
+use Zend\View\Renderer\RendererInterface;
+use Zend\View\Resolver\AggregateResolver;
+use Zend\View\Resolver\TemplatePathStack;
+
 
 class MailService implements
     ServiceLocatorAwareInterface,
     MailServiceInterface
 {
     use ServiceLocatorAwareTrait;
+    
+    /**
+     * Renderer
+     *
+     * @var \Zend\View\Renderer\RendererInterface
+     */
+    protected $renderer;
     
     /**
      * Transport
@@ -54,18 +72,11 @@ class MailService implements
     protected $subject;
     
     /**
-     * Signature
-     * 
-     * @var string
-     */
-    protected $signature;
-    
-    /**
      * From
      * 
      * @var array
      */
-    protected $from = [];
+    protected $from;
     
     /**
      * To
@@ -79,14 +90,21 @@ class MailService implements
      * 
      * @var array
      */
-    protected $cc = [];
+    protected $cc;
     
     /**
      * Bcc
      * 
      * @var array
      */
-    protected $bcc = [];
+    protected $bcc;
+    
+    /**
+     * Reply to
+     * 
+     * @var string
+     */
+    protected $replyTo = null;
     
     /**
      * Module options
@@ -113,10 +131,155 @@ class MailService implements
     }
     
     public function send()
-    {}
+    {
+        $result    = null;
+        $from      = $this->getFrom();
+        $fromEmail = $from['email'];
+        $fromName  = (isset($from['name'])) ? $from['name'] : $from['email'];
+        
+        /**
+         * Mass mail
+         * 
+         * This will silently ignore all cc and bcc messages to prevent overload,
+         * when you want an email to, add yourself to the receivers.
+         * 
+         * @todo: time out when there are to many receivers.
+         */
+    	if (count($this->getTo()) > 1) {
+    	    foreach ($this->getTo() as $to) {
+    	        $email                = $to['email'];
+    	        $name                 = (isset($to['name'])) ? $to['name'] : '';
+    	        $this->params['name'] = ('' !== $name) ? $to['name'] : $to['email'];
+    	        
+    	        $body = new MimeMessage();
+    	        $body->addPart($this->render());
+    	        
+    	        $message = new Message();
+    	        $message->addFrom($fromEmail, $fromName);
+    	        $message->addTo($email, $name);
+    	        $message->setSubject($this->getSubject());
+    	        $message->getBody()->addPart($body);
+    	        
+    	        /**
+    	         * Send email
+    	         * 
+    	         * @todo: When error occors, we trust that ZF2 throws exception, or we want to catch it?
+    	         */
+    	        $this->getTransport()->send($message);
+    	    }
+    	} else {
+    	    foreach ($this->getTo() as $to) {
+    	        $email                = $to['email'];
+    	        $name                 = (isset($to['name'])) ? $to['name'] : '';
+    	        $this->params['name'] = ('' !== $name) ? $to['name'] : $to['email'];
+    	         
+    	        $body = new MimeMessage();
+    	        $body->addPart($this->render());
+    	         
+    	        $message = new Message();
+    	        $message->addFrom($fromEmail, $fromName);
+    	        $message->addTo($email, $name);
+    	        $message->setSubject($this->getSubject());
+    	        $message->setBody($body);
+    	        
+    	        /**
+    	         * Add cc if not null
+    	         */
+    	        if (null !== $this->getCc()) {
+    	            foreach ($this->getCc() as $cc) {
+    	                $ccEmail = $cc['email'];
+    	                $ccName  = (isset($cc['name'])) ? $cc['name'] : $ccEmail;
+    	                
+    	                $message->addCc($ccEmail, $ccName);
+    	            }
+    	        }
+    	        
+    	        /**
+    	         * Add bcc if not null
+    	         */
+    	        if (null !== $this->getBcc()) {
+    	            foreach ($this->getBcc() as $bcc) {
+    	                $bccEmail = $bcc['email'];
+    	                $bccName  = (isset($bcc['name'])) ? $bcc['name'] : $bccEmail;
+    	                 
+    	                $message->addBcc($bccEmail, $bccName);
+    	            }
+    	        }
+    	         
+    	        /**
+    	         * Send email
+    	         *
+    	         * @todo: When error occors, we trust that ZF2 throws exception, or we want to catch it?
+    	        */
+    	        $this->getTransport()->send($message);
+    	    }
+    	}
+    }
     
+    /**
+     * Render
+     * 
+     * Renders an html body.
+     * 
+     * @return \Zend\Mime\Part
+     */
     public function render()
-    {}
+    {
+        if (!$this->getModuleOptions()->getTemplatePaths()) {
+            throw new InvalidArgumentException('No template paths found');
+        }
+        $paths    = $this->getModuleOptions()->getTemplatePaths();
+        $template = $this->getTemplate();
+        
+        $templateStack = new TemplatePathStack();
+        $templateStack->addPaths($paths);
+        
+        $resolver = new AggregateResolver();
+        $resolver->attach($templateStack);
+        
+        $renderer = $this->getRenderer();
+        $renderer->setResolver($resolver);
+        
+    	$viewModel = new ViewModel();
+    	$viewModel->setTemplate($template);
+    	$viewModel->setVariables($this->getParams());
+    	
+    	$body = new MimePart($this->getRenderer()->render($viewModel));
+    	$body->charset = 'UTF-8';
+    	$body->type    = Mime::TYPE_HTML;
+    	
+    	return $body;
+    }
+    
+    /**
+     * Get Renderer
+     * 
+     * @return \Zend\View\Renderer\RendererInterface
+     */
+    public function getRenderer()
+    {
+        if (null === $this->renderer) {
+            if ($this->mailOptions->getRenderer()) {
+                $renderer =  $this->getMailOptions()->getRenderer();
+                $this->setRenderer(new $renderer());
+            } else {
+                $this->setRenderer(new PhpRenderer());
+            }
+        }
+        return $this->renderer;
+    }
+    
+    /**
+     * Set Renderer
+     * 
+     * @param RendererInterface $renderer
+     * @return \Mail\Service\MailService
+     */
+    public function setRenderer(RendererInterface $renderer)
+    {
+        $this->renderer = $renderer;
+        return $this;
+    }
     
 	/**
      * Get template 
@@ -146,16 +309,6 @@ class MailService implements
      */
     public function setTemplate($template)
     {
-        $paths = $this->getModuleOptions()->getTemplatePaths();
-        
-        foreach ($paths as $path) {
-            if (file_exists($path . $template)) {
-                $template = $path . $template;
-            } elseif (file_exists($path . $template . '.phtml')) {
-                $template = $path . $template . '.phtml';
-            }
-        }
-        
         $this->template = $template;
         return $this;
     }
@@ -172,6 +325,8 @@ class MailService implements
 
 	/**
      * Set params
+     * 
+     * Each param must have keyname and value.
      *
      * @param array $params
      * @return MailService
@@ -215,6 +370,10 @@ class MailService implements
      */
     public function getFrom()
     {
+        if (null === $this->from) {
+            $this->setFrom($this->getMailOptions()->getFrom());
+        } 
+        
         return $this->from;
     }
 
@@ -230,6 +389,10 @@ class MailService implements
      */
     public function setFrom($from)
     {
+        if (!count($from)) {
+            throw new InvalidArgumentException('No email sender is set!');
+        }
+        
         $this->from = $from;
         return $this;
     }
@@ -241,6 +404,10 @@ class MailService implements
      */
     public function getTo()
     {
+        if (null === $this->to) {
+            $this->setTo($this->getMailOptions()->getTo());
+        }
+        
         return $this->to;
     }
     
@@ -249,14 +416,38 @@ class MailService implements
      *
      * Set the email receiver
      *
-     * Array must atleast contain the key email, name is optional
+     * Array must atleast contain the key email, name is optional.
+     * 
+     * This will standard overide the default receiver, set the 
+     * param $overide to false to email also the default receiver.
      *
      * @param array $to
      * @return MailService
      */
-    public function setTo(array $to)
+    public function setTo(array $to, $overide = true)
     {
-        $this->to = $to;
+        $error = false;
+        
+        foreach ($to as $array) {
+            if (!isset($array['email'])) {
+                $error = true;
+            }
+        }
+        
+        if ($error) {
+            throw new InvalidArgumentException('Key "email" not set in "to"');
+        }
+        
+        if (false === $overide) {
+            if (is_array($this->getMailOptions()->getTo())) {
+                $this->to = array_merge_recursive($this->getMailOptions()->getTo(), $to);
+            } else {
+                $this->to = $to;
+            }
+        } else {
+            $this->to = $to;
+        }
+        
         return $this;
     }
 
@@ -267,6 +458,10 @@ class MailService implements
      */
     public function getCc()
     {
+        if (null === $this->cc) {
+            $this->setCc($this->getMailOptions()->getCc());
+        }
+        
         return $this->cc;
     }
 
@@ -275,17 +470,42 @@ class MailService implements
      * 
      * Send copy to one ore more receivers.
      * 
-     * Set overide to true when you want to ignore the default
-     * bcc settings from config.
+     * This will standard overide the default cc, set the 
+     * param $overide to false to email also the default receiver(s).
      * 
-     * @param array $bcc
+     * @param array $cc
      * @param bool $overide
      * 
      * @return \Mail\Service\MailService
      */
-    public function setCc($cc, $overide = false)
+    public function setCc($cc, $overide = true)
     {
-        $this->cc = $cc;
+        if (is_array($cc) && count($cc)) {
+            $error = false;
+            
+            foreach ($cc as $array) {
+                if (!isset($array['email'])) {
+                    $error = true;
+                }
+            }
+            
+            if ($error) {
+                throw new InvalidArgumentException('Key "email" not set in "cc"');
+            }
+            
+            if (false === $overide) {
+                if (is_array($this->getMailOptions()->getCc())) {
+                    $this->cc = array_merge_recursive($this->getMailOptions()->getCc(), $cc);
+                } else {
+                    $this->cc = $cc;
+                }
+            } else {
+                $this->cc = $cc;
+            }
+        } else {
+            $this->cc = null;
+        }
+        
         return $this;
     }
 
@@ -296,6 +516,10 @@ class MailService implements
      */
     public function getBcc()
     {
+        if (null === $this->bcc) {
+            $this->setBcc($this->getMailOptions()->getBcc());
+        }
+        
         return $this->bcc;
     }
 
@@ -314,11 +538,58 @@ class MailService implements
      */
     public function setBcc(array $bcc, $overide = false)
     {
-        $this->bcc = $bcc;
+        if (is_array($bcc) && count($bcc)) {
+            $error = false;
+            
+            foreach ($bcc as $array) {
+                if (!isset($array['email'])) {
+                    $error = true;
+                }
+            }
+            
+            if ($error) {
+                throw new InvalidArgumentException('Key "email" not set in "bcc"');
+            }
+            
+            if (false === $overide) {
+                if (is_array($this->getMailOptions()->getBcc())) {
+                    $this->cc = array_merge_recursive($this->getMailOptions()->getBcc(), $bcc);
+                } else {
+                    $this->bcc = $bcc;
+                }
+            } else {
+                $this->bcc = $bcc;
+            }
+        } else {
+            $this->bcc = null;
+        }
+        
         return $this;
     }
     
     /**
+     * Get reply to 
+     *
+     * @return string
+     */
+    public function getReplyTo()
+    {
+        return $this->replyTo;
+    }
+
+	/**
+     * Set reply to
+     *
+     * @param string $replyTo
+     * @return MailService
+     */
+    public function setReplyTo($replyTo)
+    {
+        $this->replyTo = $replyTo;
+        return $this;
+    }
+
+	/**
      * Get transport 
      *
      * @return \Mail\Service\Zend\Mail\Transport\TransportInterface

@@ -16,5 +16,5 @@ interface ModuleOptionsInterface
      * @param array $templatePaths
      * @return \Mail\Options\ModuleOptionsInterface
     */
-    public function setTempatePaths(array $templatePaths = []);
+    public function setTemplatePaths(array $templatePaths);
 }

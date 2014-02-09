@@ -15,7 +15,7 @@ class ModuleOptions extends AbstractOptions implements ModuleOptionsInterface
     /**
      * @var array
      */
-    protected $templatePaths = [];
+    protected $templatePaths;
     
     /**
      * Get template paths
@@ -33,9 +33,10 @@ class ModuleOptions extends AbstractOptions implements ModuleOptionsInterface
      * @param array $templatePaths
      * @return \Mail\Options\ModuleOptionsInterface
      */
-    public function setTempatePaths(array $templatePaths = [])
+    public function setTemplatePaths(array $templatePaths)
     {
         $this->templatePaths = $templatePaths;
+        
         return $this;
     }
 }

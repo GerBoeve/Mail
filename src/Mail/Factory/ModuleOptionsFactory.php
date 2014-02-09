@@ -20,7 +20,7 @@ class ModuleOptionsFactory implements FactoryInterface
             throw new InvalidArgumentException('Configuration for template_paths not found in "mail_module"!');
         }
         
-        $options = new ModuleOptions($config['mail_module']['template_paths']);
+        $options = new ModuleOptions($config['mail_module']);
         return $options;
     }
 }

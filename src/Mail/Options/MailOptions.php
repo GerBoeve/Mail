@@ -2,6 +2,7 @@
 namespace Mail\Options;
 
 use Zend\Stdlib\AbstractOptions;
+use Zend\View\Renderer\RendererInterface;
 
 class MailOptions extends AbstractOptions implements MailOptionsInterface
 {
@@ -13,9 +14,14 @@ class MailOptions extends AbstractOptions implements MailOptionsInterface
     protected $__strictMode__ = false;
     
     /**
-     * @var string
+     * @var \Zend\View\Renderer\RendererInterface
      */
-    protected $fromName;
+    protected $renderer = 'Zend\View\Renderer\PhpRenderer';
+    
+    /**
+     * @var array
+     */
+    protected $from;
     
     /**
      * @var string
@@ -25,17 +31,17 @@ class MailOptions extends AbstractOptions implements MailOptionsInterface
     /**
      * @var array
      */
-    protected $to = [];
+    protected $to;
     
     /**
      * @var array
      */
-    protected $cc = [];
+    protected $cc;
     
     /**
      * @var array
      */
-    protected $bcc = [];
+    protected $bcc;
     
     /**
      * @var string
@@ -58,46 +64,46 @@ class MailOptions extends AbstractOptions implements MailOptionsInterface
     protected $transportConfig;
     
 	/**
-     * Get from name
-     * 
-     * @return string
+     * Get Renderer 
+     *
+     * @return \Zend\View\Renderer\RendererInterface
      */
-    public function getFromName()
+    public function getRenderer()
     {
-        return $this->fromName;
+        return $this->renderer;
     }
 
 	/**
-     * Set from name
-     * 
-     * @param string $fromName
-     * @return \Mail\Options\MailOptionsInterface
+     * Set Renderer
+     *
+     * @param \Zend\View\Renderer\RendererInterface $renderer
+     * @return MailOptions
      */
-    public function setFromName($fromName)
+    public function setRenderer(RendererInterface $renderer)
     {
-        $this->fromName = $fromName;
+        $this->renderer = $renderer;
         return $this;
     }
 
 	/**
-     * Get email from
+     * Get from
      * 
      * @return string
      */
-    public function getFromEmail()
+    public function getFrom()
     {
-        return $this->fromEmail;
+        return $this->from;
     }
 
 	/**
-     * Set email from
+     * Set from
      * 
-     * @param string $fromEmail
+     * @param array $from
      * @return \Mail\Options\MailOptionsInterface
      */
-    public function setFromEmail($fromEmail)
+    public function setFrom($from)
     {
-        $this->fromEmail = $fromEmail;
+        $this->from = $from;
         return $this;
     }
 
