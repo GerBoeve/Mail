@@ -158,7 +158,7 @@ class MailService implements
     	        $message->addFrom($fromEmail, $fromName);
     	        $message->addTo($email, $name);
     	        $message->setSubject($this->getSubject());
-    	        $message->getBody()->addPart($body);
+    	        $message->setBody($body);
     	        
     	        /**
     	         * Send email
