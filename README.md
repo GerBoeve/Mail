@@ -1,6 +1,5 @@
-Mail
-====
+Mail Module
+===========
 
-Mail module
+version: v1.0
 
-version: 0.0.1

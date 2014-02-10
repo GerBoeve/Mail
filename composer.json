@@ -1,0 +1,31 @@
+{
+	"name":"boeve-web-development/mail",
+	"description":"Zend Framework 2 module for sending email(s)",
+	"license":"BSD-3-Clause",
+	"type":"module",
+	"keywords":[
+		"Mail",
+		"zf2",
+		"zendframework"
+	],
+	"homepage":"http://boevewebdevelopment.nl",
+	"authors":[
+		{
+			"name":"Hardie Boeve",
+			"email":"hdboeve@boevewebdevelopment.nl",
+			"homepage":"http://boevewebdevelopment.nl"
+		}
+	],
+	"require":{
+		"php"                       :">=5.4.0",
+		"zendframework/zend-db"     : "2.2.*",
+		"zendframework/zend-stdlib" : "2.2.*",
+		"zendframework/zend-view"   : "2.2.*"
+	},
+	"autoload": {
+        "psr-0": {
+            "Mail\\"     : "src/",
+            "MailTest\\" :"tests/"
+        }
+    }
+}

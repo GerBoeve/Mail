@@ -19,16 +19,6 @@ return [
         ],
 
         /**
-         * Send cc (optional)
-         */
-        //'cc' => [],
-
-        /**
-         * Send bcc (optional)
-         */
-        //'bcc' => [],
-
-        /**
          * Transport type
          *
          * Available options: mail, smtp, file (see transport config)

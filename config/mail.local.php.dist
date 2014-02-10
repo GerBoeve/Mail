@@ -1,87 +1,88 @@
 <?php
 return [
-    'mail_config' => [
-
-        /**
-         * Default email sender
-         */
-        'from_name'  => 'Hardie Boeve',
-        'from_email' => 'hdboeve@boevewebdevelopment.nl',
-
-        /**
-         * Default email receiver(s)
-         */
-        'to' => [
-            [
-                'name'  => 'Hardie Boeve',
-                'email' => 'hdboeve@boevewebdevelopment.nl'
-            ]
+	'mail_config' => [
+	   
+	    /**
+	     * Default email sender
+	     */
+        'from' => [
+            'name'  => '',
+            'email' => ''
         ],
-
-        /**
-         * Send cc (optional)
-         */
-        //'cc' => [],
-
-        /**
-         * Send bcc (optional)
-         */
-        //'bcc' => [],
-
+	    
+	    /**
+	     * Default email receiver(s)
+	     */
+	    'to' => [
+	        [
+	            'name'  => '',
+	            'email' => ''
+	        ]
+	    ],
+        
         /**
          * Default email signature
          *
          * array or string
          */
         'subject' => 'subject',
-
-        /**
-         * Default email signature
-         *
-         * array or string
-         */
-        'signature' => 'signature',
-
+        
         /**
          * Transport type
-         *
+         * 
          * Available options: mail, smtp, file (see transport config)
-         *
+         * 
          */
-        'transport_type' => 'mail',
-
+        'transport_type' => '',
+        
         /**
          *  Transport config
-         *
+         *  
          *  mail:
          *   - uses  : Zend\Mail\Transport\Sendmail
          *   - config: emty array, no further configuration needed
-         *
+         *  
          *  smtp:
          *   - uses  : Zend\Mail\Transport\Smtp
          *   - config: array, for available configuration options go to http://zf2.readthedocs.org/en/latest/modules/zend.mail.smtp.options.html
-         *
+         *  
          *  file:
          *   - uses  : Zend\Mail\Transport\FileOptions
          *   - config: array, for available configuration options go to http://zf2.readthedocs.org/en/latest/modules/zend.mail.file.options.html
          */
-        'transport_config' => [],
-
+        'transport_config' => [
+            'name'              => '',
+            'host'              => '',
+            'connection_class'  => '',
+            'connection_config' => [
+                'username' => '',
+                'password' => '',
+            ]
+	    ],
+        
+        /**
+         * Renderer
+         * 
+         * The renderer to render email body.
+         * Standard is the Zend\View\Renderer\PhpRenderer will be used.
+         */
+        //'renderer' => 'Renderer',
+        
         /**
          * Default template
          */
         'template' => 'default.phtml',
-
+        
         /**
          * Template paths
-         *
+         * 
          * For custom templates, copy the folowing lines to the module.config.php of the appropriate module
          *
          * 'mail_module' => [
          *     'template_paths' => [
-         *         __DIR__ . '/../view/mail/templates/'
+         *         __DIR__ . '/../view/mail/templates'
          *     ]
          * ]
         */
-    ]
+	]
 ];

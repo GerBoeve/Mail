@@ -8,8 +8,6 @@
  * @copyright 2014 Boeve Web Development
  * @license   LICENCE
  *
- * @todo: attachements
- *
  */
 namespace Mail\Service;
 
