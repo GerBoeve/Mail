@@ -1,0 +1,6 @@
+.~lock.*
+.DS_Store
+.settings
+.buildpath
+.project
+composer.lock
