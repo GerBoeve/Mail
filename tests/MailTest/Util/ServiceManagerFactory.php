@@ -1,5 +1,13 @@
 <?php
 /**
+ * Service Manager Factory
+ *
+ * @author    Hardie Boeve (hdboeve@boevewebdevelopment.nl)
+ * @copyright 2014 Boeve Web Development
+ * @license   LICENSE
+ * @link      http://boevewebdevelopment.nl
+ */
+/**
  * Utility used to retrieve a freshly bootstrapped application's service manager
  *
  * @license MIT

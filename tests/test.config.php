@@ -4,7 +4,7 @@
  *
  * @author    Hardie Boeve (hdboeve@boevewebdevelopment.nl)
  * @copyright 2014 Boeve Web Development
- * @license   http://opensource.org/licenses/BSD-3-Clause
+ * @license   LICENSE
  * @link      http://boevewebdevelopment.nl
  */
 return [
