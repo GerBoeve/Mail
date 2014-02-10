@@ -8,11 +8,11 @@ Install
 
 #### With composer
 
-	```json
+```json
     "require": {
         "boeve-web-development/mail" : "dev-master"
     }
-    ```
+```
 
 #### Configuration
 
