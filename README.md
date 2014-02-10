@@ -6,4 +6,15 @@ version: v1.0
 Install
 -------
 
-composer require boeve-web-development/log: "dev-master" //or an specific version
+#### With composer
+
+	```json
+    "require": {
+        "boeve-web-development/mail" : "dev-master"
+    }
+    ```
+
+#### Configuration
+
+- Copy the file mail.local.php.dist to config/autoload/mail.local.php
+- And fill in the required and optional options.
