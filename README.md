@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/BoeveWebDevelopment/Mail.png?branch=master)](https://travis-ci.org/BoeveWebDevelopment/Mail)
+
 Mail Module
 ===========
 
